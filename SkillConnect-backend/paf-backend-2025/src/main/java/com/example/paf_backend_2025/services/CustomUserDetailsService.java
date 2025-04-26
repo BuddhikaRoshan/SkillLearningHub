@@ -1,7 +1,7 @@
-package com.example.pafbackend.services;
+package com.example.paf_backend_2025.services;
 
-import com.example.pafbackend.models.AppUser;
-import com.example.pafbackend.repositories.AppUserRepository;
+import com.example.paf_backend_2025.models.AppUser;
+import com.example.paf_backend_2025.repositories.AppUserRepository;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
