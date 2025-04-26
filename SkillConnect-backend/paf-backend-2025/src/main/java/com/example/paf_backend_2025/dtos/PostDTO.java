@@ -1,4 +1,4 @@
-package com.example.pafbackend.dtos;
+package com.example.paf_backend_2025;
 
 import java.util.List;
 
