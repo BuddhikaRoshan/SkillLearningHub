@@ -23,6 +23,7 @@ public class Post {
 
     @DBRef
     private List<AppUser> taggedUsers;
+
     public Post() {
         this.createdAt = new Date();
         this.updatedAt = new Date();
