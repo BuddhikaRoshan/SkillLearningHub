@@ -1,4 +1,4 @@
-package com.example.pafbackend.config;
+package com.example.paf_backend_2025.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
