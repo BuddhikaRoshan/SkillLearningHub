@@ -1,7 +1,7 @@
 package com.example.paf_backend_2025.dtos;
 
-import com.example.pafbackend.models.AppUser;
-import com.example.pafbackend.models.MediaType;
+import com.example.paf_backend_2025.models.AppUser;
+import com.example.paf_backend_2025.models.MediaType;
 
 import java.util.Date;
 import java.util.List;
