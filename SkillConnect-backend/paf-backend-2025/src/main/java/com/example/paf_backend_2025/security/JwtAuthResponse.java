@@ -1,4 +1,4 @@
-package com.example.pafbackend.security;
+package com.example.paf_backend_2025.security;
 
 public class JwtAuthResponse {
     private String token;

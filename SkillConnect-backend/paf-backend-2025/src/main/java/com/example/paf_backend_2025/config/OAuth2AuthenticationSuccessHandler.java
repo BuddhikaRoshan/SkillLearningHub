@@ -1,8 +1,8 @@
-package com.example.pafbackend.config;
+package com.example.paf_backend_2025.config;
 
-import com.example.pafbackend.models.AppUser;
-import com.example.pafbackend.repositories.AppUserRepository;
-import com.example.pafbackend.security.JwtTokenProvider;
+import com.example.paf_backend_2025.models.AppUser;
+import com.example.paf_backend_2025.repositories.AppUserRepository;
+import com.example.paf_backend_2025.security.JwtTokenProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

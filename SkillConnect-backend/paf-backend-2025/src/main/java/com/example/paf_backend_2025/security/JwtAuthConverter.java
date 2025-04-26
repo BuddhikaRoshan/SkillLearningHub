@@ -1,4 +1,4 @@
-package com.example.pafbackend.security;
+package com.example.paf_backend_2025.security;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;

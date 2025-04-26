@@ -1,4 +1,4 @@
-package com.example.pafbackend.security;
+package com.example.paf_backend_2025.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
