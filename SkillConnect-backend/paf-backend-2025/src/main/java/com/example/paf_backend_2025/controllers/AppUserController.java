@@ -1,10 +1,10 @@
-package com.example.pafbackend.controllers;
+package com.example.paf_backend_2025.controllers;
 
-import com.example.pafbackend.dtos.AppUserDTO;
-import com.example.pafbackend.dtos.LoginDTO;
-import com.example.pafbackend.dtos.UserProfileDTO;
-import com.example.pafbackend.models.AppUser;
-import com.example.pafbackend.services.AppUserService;
+import com.example.paf_backend_2025.dtos.AppUserDTO;
+import com.example.paf_backend_2025.dtos.LoginDTO;
+import com.example.paf_backend_2025.dtos.UserProfileDTO;
+import com.example.paf_backend_2025.models.AppUser;
+import com.example.paf_backend_2025.services.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
