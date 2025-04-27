@@ -1,4 +1,4 @@
-package com.example.pafbackend.models;
+package com.example.paf_backend_2025.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;

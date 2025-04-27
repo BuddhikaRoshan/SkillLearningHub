@@ -1,8 +1,8 @@
-package com.example.pafbackend.controllers;
+package com.example.paf_backend_2025.controllers;
 
-import com.example.pafbackend.dtos.NotificationDTO;
-import com.example.pafbackend.models.Notification;
-import com.example.pafbackend.services.NotificationService;
+import com.example.paf_backend_2025.dtos.NotificationDTO;
+import com.example.paf_backend_2025.models.Notification;
+import com.example.paf_backend_2025.services.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,10 +1,10 @@
-package com.example.pafbackend.services;
+package com.example.paf_backend_2025.services;
 
-import com.example.pafbackend.dtos.NotificationDTO;
-import com.example.pafbackend.models.AppUser;
-import com.example.pafbackend.models.Notification;
-import com.example.pafbackend.repositories.AppUserRepository;
-import com.example.pafbackend.repositories.NotificationRepository;
+import com.example.paf_backend_2025.dtos.NotificationDTO;
+import com.example.paf_backend_2025.models.AppUser;
+import com.example.paf_backend_2025.models.Notification;
+import com.example.paf_backend_2025.repositories.AppUserRepository;
+import com.example.paf_backend_2025.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
