@@ -235,13 +235,6 @@ cd frontend
 npm test
 ```
 
----
-
-## 📱 Screenshots
-
-*(Add screenshots of your application here)*
-
----
 
 ## 🌟 Main Pages
 
@@ -265,11 +258,11 @@ This project is licensed under the MIT License.
 
 * **Buddhika Roshan**  
   Undergraduate, Sri Lanka Institute of Information Technology (SLIIT)
-  * **Sonali Liyanahetti**  
+* **Sonali Liyanahetti**  
   Undergraduate, Sri Lanka Institute of Information Technology (SLIIT)
 * **Heshani Niwanthika**  
   Undergraduate, Sri Lanka Institute of Information Technology (SLIIT)
-  * **Shamith Udesha**  
+* **Shamith Udesha**  
   Undergraduate, Sri Lanka Institute of Information Technology (SLIIT)
 
 ---
