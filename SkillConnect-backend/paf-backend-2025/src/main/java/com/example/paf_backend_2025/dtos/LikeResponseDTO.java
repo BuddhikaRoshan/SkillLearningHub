@@ -1,7 +1,7 @@
-package com.example.pafbackend.dtos;
+package com.example.paf_backend_2025.dtos;
 
-import com.example.pafbackend.models.AppUser;
-import com.example.pafbackend.models.Post;
+import com.example.paf_backend_2025.models.AppUser;
+import com.example.paf_backend_2025.models.Post;
 import java.util.Date;
 
 public class LikeResponseDTO {
