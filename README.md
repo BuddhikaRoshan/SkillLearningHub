@@ -50,16 +50,14 @@ skill-learning-hub/
 ├── frontend/
 │   ├── public/
 │   ├── src/
+│   │   ├── api/
 │   │   ├── assets/
 │   │   ├── components/
-│   │   ├── contexts/
-│   │   ├── hooks/
 │   │   ├── pages/
 │   │   ├── services/
-│   │   ├── utils/
-│   │   ├── App.js
-│   │   ├── index.js
-│   │   └── routes.js
+│   │   ├── App.jsx
+│   │   ├── index.css
+│   │   └── main.jsx
 │   ├── package.json
 │   ├── package-lock.json
 │   └── .gitignore
@@ -109,7 +107,7 @@ skill-learning-hub/
 
 1. **Clone the Repository**
 ```bash
-git clone https://github.com/your-username/skill-learning-hub.git
+git clone https://github.com/BuddhikaRoshan/skill-learning-hub.git
 cd skill-learning-hub/backend
 ```
 
@@ -149,7 +147,7 @@ npm install
 
 3. **Run the Frontend**
 ```bash
-npm start
+npm run dev
 ```
 The application will open in your browser at `http://localhost:3000`
 
@@ -203,7 +201,7 @@ The application will open in your browser at `http://localhost:3000`
 | GET | `/api/notifications/{userId}` | Get user notifications |
 | POST | `/api/notifications` | Create notification |
 | DELETE | `/api/notifications/{id}` | Delete notification |
-| PUT | `/api/notifications/preferences` | Update notification preferences |
+
 
 If you use Swagger for API documentation, you can access it at:
 `http://localhost:8081/swagger-ui/`
@@ -274,8 +272,8 @@ This project is licensed under the MIT License.
 * ✅ User Management with Google Login Implemented
 * ✅ Post Management with Social Features Complete
 * ✅ Comment & Like System Implemented
-* 🛠️ Notification System In Progress
-* 🛠️ Learning Progress Plans In Progress
+* 🛠️ Notification System  Complete
+* 🛠️ Learning Progress Plans complete
 * 🚀 Deployment Planned
 
 ---
@@ -287,22 +285,3 @@ For any questions or support:
 * Email: buddhikaroshanofficial@gmail.com
 
 ---
-
-# 🔥 Special Tips for Uploading
-
-✅ Create a file named README.md inside your project root.  
-✅ Paste the above content.  
-✅ Replace:
-  - your-username → your GitHub username
-  - YOUR_GOOGLE_CLIENT_ID and YOUR_GOOGLE_CLIENT_SECRET → your actual Google OAuth credentials
-  - Update MongoDB configuration if needed
-  - Add your actual screenshots
-  - Update your email address
-  - Adjust project status as needed
-
-✅ Then commit and push:
-```bash
-git add README.md
-git commit -m "Add comprehensive project README"
-git push
-```
