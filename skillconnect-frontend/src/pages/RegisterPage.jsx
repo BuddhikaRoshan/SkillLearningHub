@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { TextField, Button, Checkbox, FormControlLabel, CircularProgress } from "@mui/material";
+import { TextField, Button, Checkbox, FormControlLabel, CircularProgress, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import userApi from "../api/userApi";
 import BubbleBackground from "./BubbleBackground"; // Correct the import path
 
@@ -200,20 +200,22 @@ const RegisterPage = () => {
 
               {/* Gender */}
               <div>
-                <TextField
-                  id="gender"
-                  label="Gender"
-                  name="gender"
-                  value={formData.gender}
-                  onChange={handleChange}
-                  select
-                  fullWidth
-                >
-                  <option value="">Select</option>
-                  <option value="MALE">Male</option>
-                  <option value="FEMALE">Female</option>
-                  <option value="OTHER">Other</option>
-                </TextField>
+                <FormControl fullWidth>
+                  <InputLabel id="gender-label">Gender</InputLabel>
+                  <Select
+                    labelId="gender-label"
+                    id="gender"
+                    name="gender"
+                    value={formData.gender}
+                    label="Gender"
+                    onChange={handleChange}
+                  >
+                    <MenuItem value="">Select</MenuItem>
+                    <MenuItem value="male">Male</MenuItem>
+                    <MenuItem value="female">Female</MenuItem>
+                    <MenuItem value="other">Other</MenuItem>
+                  </Select>
+                </FormControl>
               </div>
 
               {/* Date of Birth */}
