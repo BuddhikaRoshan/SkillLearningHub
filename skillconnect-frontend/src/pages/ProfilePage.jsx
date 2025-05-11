@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import userApi from "../api/userApi";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../services/firebaseConfig";
+import { uploadFile } from "../services/uploadFileService";
 import {
   Avatar,
   Box,
@@ -27,6 +28,9 @@ import {
   InputLabel,
   FormControl,
   Grid,
+  Card,
+  CardContent,
+  CircularProgress,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import {
@@ -35,9 +39,14 @@ import {
   Logout as LogoutIcon,
   Delete as DeleteIcon,
   Image as ImageIcon,
+  LocationOn,
+  Email,
+  Phone,
+  Cake,
+  Person,
+  CalendarToday,
 } from "@mui/icons-material";
 import UserPostsContainer from "../components/UserPostsContainer";
-
 
 const createBubble = (atBottom = false) => {
   const viewportWidth = window.innerWidth;
@@ -111,53 +120,74 @@ const BubbleBackground = () => {
   );
 };
 
+// Styled Components
+const PageContainer = styled(Box)(({ theme }) => ({
+  minHeight: "100vh",
+  background: "linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)",
+  padding: theme.spacing(3),
+  [theme.breakpoints.down("sm")]: {
+    padding: theme.spacing(2),
+  },
+}));
 
-
-// Custom styled components
-const ProfilePaper = styled(Paper)(({ theme }) => ({
-  borderRadius: theme.spacing(2),
+const CoverSection = styled(Box)(({ theme }) => ({
+  height: 300,
+  width: "100%",
+  position: "relative",
   overflow: "hidden",
+  borderRadius: theme.spacing(2),
+  marginBottom: theme.spacing(15),
+  [theme.breakpoints.down("md")]: {
+    height: 200,
+    marginBottom: theme.spacing(12),
+  },
+}));
+
+const ProfileSection = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'flex-start',
+  marginTop: -theme.spacing(15),
+  position: 'relative',
+  zIndex: 2,
+  [theme.breakpoints.down("md")]: {
+    marginTop: -theme.spacing(12),
+  },
+}));
+
+const ProfileCard = styled(Card)(({ theme }) => ({
+  width: '100%',
+  maxWidth: 400,
+  borderRadius: theme.spacing(2),
   boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-  transition: "all 0.3s ease",
   backgroundColor: theme.palette.background.paper,
 }));
 
-const StyledAvatar = styled(Avatar)(({ theme }) => ({
-  width: theme.spacing(14),
-  height: theme.spacing(14),
-  border: `4px solid ${theme.palette.common.white}`,
-  boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
-  transition: "all 0.3s ease",
-  backgroundColor: theme.palette.primary.main,
-}));
-
-const ButtonsContainer = styled(Box)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  gap: theme.spacing(2),
-  marginTop: theme.spacing(4),
-  [theme.breakpoints.up("sm")]: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-  },
-}));
-
-const CoverBox = styled(Box)(({ theme }) => ({
-  position: "relative",
-  height: 300,
-  width: "100%",
-  overflow: "hidden",
+const ProfileImage = styled(Box)(({ theme }) => ({
+  width: 150,
+  height: 150,
+  borderRadius: '50%',
+  overflow: 'hidden',
+  border: '6px solid white',
+  boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+  marginTop: -100,
   marginBottom: theme.spacing(2),
-  [theme.breakpoints.down("md")]: {
-    height: 200,
-  },
+  position: 'relative',
+  backgroundColor: 'white',
 }));
 
-const Overlay = styled(Box)(({ theme }) => ({
-  position: "absolute",
-  inset: 0,
-  background:
-    "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%)",
+const InfoItem = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing(1),
+  marginBottom: theme.spacing(1.5),
+  color: theme.palette.text.secondary,
+}));
+
+const PostsSection = styled(Box)(({ theme }) => ({
+  width: '300%',
+  maxWidth: 1100,
+  margin: '0 auto',
 }));
 
 const ProfilePage = () => {
@@ -189,46 +219,112 @@ const ProfilePage = () => {
   const profileImageInputRef = useRef(null);
   const coverImageInputRef = useRef(null);
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
+  const uploadCoverImage = async (file) => {
+    try {
+      const fileUrl = await uploadFile(file, (progress) => {
+        console.log(`Upload progress: ${progress}%`);
+      });
+      return fileUrl;
+    } catch (error) {
+      console.error("Error uploading cover image:", error);
+      throw new Error("Failed to upload cover image");
+    }
+  };
+
+  const handleCoverImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
       try {
         setLoading(true);
-        const userId = localStorage.getItem("userId");
-        if (!userId) {
-          navigate("/login");
-          return;
-        }
-        const userData = await userApi.getUserById(userId);
-        if (!userData) {
-          throw new Error("User data not found");
-        }
-        setUser(userData);
-        setFormData({
-          firstName: userData.firstName || "",
-          lastName: userData.lastName || "",
-          username: userData.username || "",
-          email: userData.email || "",
-          contactNumber: userData.contactNumber || "",
-          gender: userData.gender || "",
-          birthday: userData.birthday || "",
-          address: userData.address || "",
-          bio: userData.bio || "",
-        });
-        if (userData.profileImageUrl) {
-          setPreviewImage(userData.profileImageUrl);
-        }
-        if (userData.coverImageUrl) {
-          setPreviewCoverImage(userData.coverImageUrl);
-        }
+        // Create a preview immediately
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviewCoverImage(reader.result);
+        };
+        reader.readAsDataURL(file);
+
+        // Upload the file
+        const coverImageUrl = await uploadCoverImage(file);
+        setCoverImage(file);
+        
+        // Update the user's cover image URL in the backend
+        const updateData = {
+          ...formData,
+          coverImageUrl: coverImageUrl
+        };
+        
+        const updatedUser = await userApi.updateUser(user.id, updateData);
+        setUser(updatedUser);
+        
+        // Store the new cover image URL in localStorage with user-specific key
+        localStorage.setItem(`userCoverImage_${user.id}`, coverImageUrl);
+        
+        setSuccess("Cover image updated successfully!");
+        setSnackbarOpen(true);
       } catch (err) {
         console.error(err);
-        setError(err.message || "Failed to load profile");
+        setError(err.message || "Failed to update cover image");
         setSnackbarOpen(true);
       } finally {
         setLoading(false);
       }
-    };
+    }
+  };
 
+  const fetchUserProfile = async () => {
+    try {
+      setLoading(true);
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        navigate("/login");
+        return;
+      }
+      const userData = await userApi.getUserById(userId);
+      if (!userData) {
+        throw new Error("User data not found");
+      }
+      setUser(userData);
+      setFormData({
+        firstName: userData.firstName || "",
+        lastName: userData.lastName || "",
+        username: userData.username || "",
+        email: userData.email || "",
+        contactNumber: userData.contactNumber || "",
+        gender: userData.gender || "",
+        birthday: userData.birthday || "",
+        address: userData.address || "",
+        bio: userData.bio || ""
+      });
+      
+      // Check both userData and localStorage for profile image
+      const profileImageUrl = userData.profileImageUrl || localStorage.getItem("userImage");
+      if (profileImageUrl) {
+        setPreviewImage(profileImageUrl);
+        // Update localStorage if it's from userData
+        if (userData.profileImageUrl) {
+          localStorage.setItem("userImage", userData.profileImageUrl);
+        }
+      }
+      
+      // Check both userData and localStorage for cover image with user-specific key
+      const coverImageUrl = userData.coverImageUrl || localStorage.getItem(`userCoverImage_${userData.id}`);
+      if (coverImageUrl) {
+        setPreviewCoverImage(coverImageUrl);
+        // Update localStorage if it's from userData
+        if (userData.coverImageUrl) {
+          localStorage.setItem(`userCoverImage_${userData.id}`, userData.coverImageUrl);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Failed to load profile");
+      setSnackbarOpen(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchUserProfile();
   }, [navigate]);
 
@@ -240,46 +336,56 @@ const ProfilePage = () => {
     }));
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setProfileImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleCoverImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setCoverImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewCoverImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const uploadProfileImage = async (file) => {
-    const storageRef = ref(
-      storage,
-      `profile-images/${Date.now()}-${file.name}`
-    );
-    const snapshot = await uploadBytes(storageRef, file);
-    return await getDownloadURL(snapshot.ref);
+    try {
+      const fileUrl = await uploadFile(file, (progress) => {
+        console.log(`Upload progress: ${progress}%`);
+      });
+      return fileUrl;
+    } catch (error) {
+      console.error("Error uploading profile image:", error);
+      throw new Error("Failed to upload profile image");
+    }
   };
 
-  const uploadCoverImage = async (file) => {
-    const storageRef = ref(
-      storage,
-      `cover-images/${Date.now()}-${file.name}`
-    );
-    const snapshot = await uploadBytes(storageRef, file);
-    return await getDownloadURL(snapshot.ref);
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      try {
+        setLoading(true);
+        // Create a preview immediately
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviewImage(reader.result);
+        };
+        reader.readAsDataURL(file);
+
+        // Upload the file
+        const profileImageUrl = await uploadProfileImage(file);
+        setProfileImage(file);
+        
+        // Update the user's profile image URL in the backend
+        const updateData = {
+          ...formData,
+          profileImageUrl: profileImageUrl
+        };
+        
+        const updatedUser = await userApi.updateUser(user.id, updateData);
+        setUser(updatedUser);
+        
+        // Store the new profile image URL in localStorage
+        localStorage.setItem("userImage", profileImageUrl);
+        
+        setSuccess("Profile image updated successfully!");
+        setSnackbarOpen(true);
+      } catch (err) {
+        console.error(err);
+        setError(err.message || "Failed to update profile image");
+        setSnackbarOpen(true);
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -291,6 +397,8 @@ const ProfilePage = () => {
       if (profileImage) {
         const profileImageUrl = await uploadProfileImage(profileImage);
         updateData.profileImageUrl = profileImageUrl;
+        // Store the new profile image URL in localStorage
+        localStorage.setItem("userImage", profileImageUrl);
       }
       if (coverImage) {
         const coverImageUrl = await uploadCoverImage(coverImage);
@@ -303,7 +411,6 @@ const ProfilePage = () => {
       setSnackbarOpen(true);
       setEditing(false);
 
-      // Reset temporary images after update
       setProfileImage(null);
       setCoverImage(null);
     } catch (err) {
@@ -345,25 +452,15 @@ const ProfilePage = () => {
 
   if (loading && !user) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-      >
-        <Typography>Loading...</Typography>
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <CircularProgress />
       </Box>
     );
   }
 
   if (!user) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-      >
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
         <Alert severity="error">Failed to load profile</Alert>
       </Box>
     );
@@ -373,180 +470,247 @@ const ProfilePage = () => {
   const isOwnProfile = true;
 
   return (
-    <Box sx={{ bgcolor: "transparent", minHeight: "100vh", background: "linear-gradient(to bottom right, #a7f3d0, #f3e8ff)" }}>
-      <BubbleBackground />
-      {/* Cover Photo Section */}
-      <CoverBox>
-        {previewCoverImage ? (
-          <Box
-            component="img"
-            src={previewCoverImage}
-            alt="Cover"
-            sx={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              transition: "all 0.3s ease",
-            }}
-          />
-        ) : (
-          <Box
-            sx={{
-              width: "100%",
-              height: "100%",
-              bgcolor: "grey.200",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <ImageIcon sx={{ fontSize: 60, color: "grey.400" }} />
-          </Box>
-        )}
-
-        <Overlay />
-
-        {isOwnProfile && (
-          <>
+    <PageContainer>
+      <Container maxWidth="md" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 6 }}>
+        {/* Section 1: Cover Image */}
+        <Box sx={{ width: '250%', maxWidth: 1100, mb: 4, position: 'relative' }}>
+          {previewCoverImage ? (
+            <Box
+              component="img"
+              src={previewCoverImage}
+              alt="Cover"
+              sx={{
+                width: '100%',
+                height: 220,
+                objectFit: 'cover',
+                borderRadius: 4,
+              }}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: '100%',
+                height: 220,
+                bgcolor: 'grey.200',
+                borderRadius: 4,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <ImageIcon sx={{ fontSize: 60, color: 'grey.400' }} />
+            </Box>
+          )}
+          {isOwnProfile && (
             <IconButton
               onClick={() => coverImageInputRef.current?.click()}
               sx={{
-                position: "absolute",
+                position: 'absolute',
                 bottom: 16,
                 right: 16,
-                bgcolor: "rgba(0, 0, 0, 0.5)",
-                "&:hover": { bgcolor: "rgba(0, 0, 0, 0.7)" },
-                color: "white",
+                bgcolor: 'rgba(0, 0, 0, 0.5)',
+                '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.7)' },
+                color: 'white',
               }}
-              aria-label="upload cover image"
             >
               <PhotoCameraIcon />
             </IconButton>
-            <input
-              type="file"
-              accept="image/*"
-              ref={coverImageInputRef}
-              style={{ display: "none" }}
-              onChange={handleCoverImageChange}
-            />
-          </>
-        )}
-      </CoverBox>
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            ref={coverImageInputRef}
+            style={{ display: 'none' }}
+            onChange={handleCoverImageChange}
+          />
+        </Box>
 
-
-      <Container maxWidth="lg" sx={{ mb: 4, px: 0 }}>
-        <Grid container spacing={0} justifyContent="center">
-          {/* Left Column - Profile Details */}
-          <Grid item xs={12} md={5}> {/* Profile section with increased width */}
-            <ProfilePaper
-              sx={{
-                p: 3,
-                mx: "auto",         // Centers the card horizontally
-                width: "100%",
-
-              }}
-            >
-              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 3 }}>
-                <Box sx={{ position: "relative", mb: 2 }}>
-                  <StyledAvatar src={previewImage}>
-                    {!previewImage &&
-                      (user.firstName?.charAt(0) || user.username?.charAt(0))}
-                  </StyledAvatar>
-                  {isOwnProfile && (
-                    <>
-                      <IconButton
-                        onClick={() => profileImageInputRef.current?.click()}
-                        sx={{
-                          position: "absolute",
-                          bottom: 0,
-                          right: 0,
-                          bgcolor: "primary.main",
-                          "&:hover": { bgcolor: "primary.dark" },
-                        }}
-                        size="small"
-                        aria-label="upload profile image"
-                      >
-                        <PhotoCameraIcon sx={{ fontSize: 20, color: "white" }} />
-                      </IconButton>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        ref={profileImageInputRef}
-                        style={{ display: "none" }}
-                        onChange={handleImageChange}
-                      />
-                    </>
-                  )}
-                </Box>
-                <Typography variant="h5" gutterBottom>
-                  {user.firstName} {user.lastName}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  @{user.username}
-                </Typography>
+        {/* Section 2: Profile Section */}
+        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mb: 4 }}>
+          <ProfileCard sx={{ maxWidth: 900, width: '100%', minHeight: 320, p: 0, display: 'flex', flexDirection: 'row', alignItems: 'stretch', borderRadius: 4 }}>
+            {/* Profile Image on the left */}
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 4, minWidth: 200 }}>
+              <ProfileImage>
+                {previewImage ? (
+                  <Box
+                    component="img"
+                    src={previewImage}
+                    alt="Profile"
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <Avatar
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+                      fontSize: "4rem",
+                      backgroundColor: "primary.main",
+                    }}
+                  >
+                    {user.firstName?.charAt(0) || user.username?.charAt(0)}
+                  </Avatar>
+                )}
+                {isOwnProfile && (
+                  <IconButton
+                    onClick={() => profileImageInputRef.current?.click()}
+                    sx={{
+                      position: "absolute",
+                      bottom: 8,
+                      right: 8,
+                      bgcolor: "primary.main",
+                      "&:hover": { bgcolor: "primary.dark" },
+                      color: "white",
+                      padding: 1,
+                    }}
+                  >
+                    <PhotoCameraIcon />
+                  </IconButton>
+                )}
+              </ProfileImage>
+              <input
+                type="file"
+                accept="image/*"
+                ref={profileImageInputRef}
+                style={{ display: "none" }}
+                onChange={handleImageChange}
+              />
+            </Box>
+            {/* Details on the right */}
+            <CardContent sx={{ p: 4, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center' }}>
+              <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+                {user.firstName} {user.lastName}
+              </Typography>
+              <Typography variant="subtitle1" color="textSecondary" gutterBottom>
+                @{user.username}
+              </Typography>
+              {/* Contact Information */}
+              <Box sx={{ width: "100%", mt: 1 }}>
+                <InfoItem>
+                  <Email fontSize="small" />
+                  <Typography variant="body2">{user.email}</Typography>
+                </InfoItem>
+                {user.contactNumber && (
+                  <InfoItem>
+                    <Phone fontSize="small" />
+                    <Typography variant="body2">{user.contactNumber}</Typography>
+                  </InfoItem>
+                )}
+                {user.address && (
+                  <InfoItem>
+                    <LocationOn fontSize="small" />
+                    <Typography variant="body2">{user.address}</Typography>
+                  </InfoItem>
+                )}
+                {user.birthday && (
+                  <InfoItem>
+                    <Cake fontSize="small" />
+                    <Typography variant="body2">
+                      {new Date(user.birthday).toLocaleDateString()}
+                    </Typography>
+                  </InfoItem>
+                )}
+                {user.gender && (
+                  <InfoItem>
+                    <Person fontSize="small" />
+                    <Typography variant="body2">{user.gender}</Typography>
+                  </InfoItem>
+                )}
+                <InfoItem>
+                  <CalendarToday fontSize="small" />
+                  <Typography variant="body2">
+                    Joined {new Date(user.createdAt).toLocaleDateString()}
+                  </Typography>
+                </InfoItem>
               </Box>
-
-              <Divider sx={{ my: 2 }} />
-
-              <Box sx={{ mb: 3, textAlign: "center" }}>
-                <Typography variant="h6" gutterBottom>
+              <Divider sx={{ width: "100%", my: 2 }} />
+              {/* About Section */}
+              <Box sx={{ width: "100%" }}>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
                   About Me
                 </Typography>
-                <Typography variant="body2" paragraph>
+                <Typography variant="body2" color="textSecondary" paragraph>
                   {user.bio || "No bio provided"}
                 </Typography>
-                <Typography variant="caption" color="textSecondary">
-                  Member since {new Date(user.createdAt).toLocaleDateString()}
-                </Typography>
               </Box>
-
-
-            </ProfilePaper>
-            {/* Action Buttons */}
-            {isOwnProfile && (
-              <ButtonsContainer>
-                <Button
-                  variant="contained"
-                  startIcon={<EditIcon sx={{ fontSize: 18 }} />}
-                  onClick={() => setEditing(true)}
-                  fullWidth
+              {/* Action Buttons */}
+              {isOwnProfile && (
+                <Box
+                  sx={{
+                    width: '100%',
+                    mt: 2,
+                    display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: 2,
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                  }}
                 >
-                  Edit Profile
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="inherit"
-                  startIcon={<LogoutIcon sx={{ fontSize: 18 }} />}
-                  onClick={handleLogout}
-                  fullWidth
-                >
-                  Logout
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="error"
-                  startIcon={<DeleteIcon sx={{ fontSize: 18 }} />}
-                  onClick={() => setDeleteDialog(true)}
-                  fullWidth
-                >
-                  Delete Account
-                </Button>
-              </ButtonsContainer>
-            )}
-          </Grid>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<EditIcon />}
+                    onClick={() => setEditing(true)}
+                    sx={{ minWidth: 120 }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="inherit"
+                    startIcon={<LogoutIcon />}
+                    onClick={handleLogout}
+                    sx={{ minWidth: 120 }}
+                  >
+                    Logout
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    startIcon={<DeleteIcon />}
+                    onClick={() => setDeleteDialog(true)}
+                    sx={{ minWidth: 120 }}
+                  >
+                    Delete
+                  </Button>
+                </Box>
+              )}
+            </CardContent>
+          </ProfileCard>
+        </Box>
 
-
-          {/* Right Column - User Posts */}
-          <Grid item xs={12} md={7}> {/* Increased md to 7 for the posts section */}
-            <UserPostsContainer userId={user.id} isOwnProfile={isOwnProfile} />
-          </Grid>
-
-        </Grid>
+        {/* Section 3: Posts Section */}
+        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+          <PostsSection sx={{ width: '100%', maxWidth: 1100 }}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 3,
+                borderRadius: 2,
+                bgcolor: "background.paper",
+                boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+              }}
+            >
+              <Typography
+                variant="h5"
+                gutterBottom
+                sx={{
+                  fontWeight: 600,
+                  mb: 3,
+                  textAlign: "center",
+                  color: "text.primary",
+                }}
+              >
+                Posts
+              </Typography>
+              <UserPostsContainer userId={user.id} isOwnProfile={isOwnProfile} />
+            </Paper>
+          </PostsSection>
+        </Box>
       </Container>
-
-
-
-
 
       {/* Edit Profile Dialog */}
       <Dialog
@@ -702,7 +866,7 @@ const ProfilePage = () => {
           {error || success}
         </Alert>
       </Snackbar>
-    </Box>
+    </PageContainer>
   );
 };
 
